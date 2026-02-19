@@ -1,0 +1,29 @@
+{
+  "name": "agentic-honeypot",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/tushar-sword/Agentic-HoneyPot#readme",
+  "bugs": {
+    "url": "https://github.com/tushar-sword/Agentic-HoneyPot/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tushar-sword/Agentic-HoneyPot.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js"
+
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "node-fetch": "^3.3.2",
+    "openai": "^6.16.0",
+    "zod": "^4.3.6"
+  }
+}
