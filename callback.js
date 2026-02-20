@@ -60,14 +60,14 @@ export async function sendFinalCallback(memory) {
         success = true;
         memory.finalCallbackSent = true;
         memory.sessionClosed = true;
-        console.log(`[Callback] ✅ Successfully sent for session ${memory.sessionId} (attempt ${attempt})`);
+        console.log(`[Callback]  Successfully sent for session ${memory.sessionId} (attempt ${attempt})`);
       } else {
         const body = await response.text().catch(() => "");
-        console.error(`[Callback] ❌ HTTP ${response.status} on attempt ${attempt}: ${body}`);
+        console.error(`[Callback]  HTTP ${response.status} on attempt ${attempt}: ${body}`);
       }
 
     } catch (err) {
-      console.error(`[Callback] ❌ Network error on attempt ${attempt}:`, err.message);
+      console.error(`[Callback]  Network error on attempt ${attempt}:`, err.message);
     }
 
     if (!success && attempt < MAX_RETRIES) {
@@ -78,7 +78,7 @@ export async function sendFinalCallback(memory) {
   }
 
   if (!success) {
-    console.error(`[Callback] 🚨 CRITICAL: Failed to send callback after ${MAX_RETRIES} attempts for session ${memory.sessionId}`);
+    console.error(`[Callback]  CRITICAL: Failed to send callback after ${MAX_RETRIES} attempts for session ${memory.sessionId}`);
   }
 }
 
@@ -127,11 +127,8 @@ function buildPayload(memory) {
   };
 }
 
-/* ──────────────────────────────────────────────
-   AGENT NOTES GENERATOR
-   Uses suspicious keywords + tactics for max
-   red flag identification scoring
-────────────────────────────────────────────── */
+
+ // AGENT NOTES GENERATOR
 
 function generateAgentNotes(memory) {
   const notes = [];
