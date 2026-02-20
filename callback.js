@@ -109,18 +109,18 @@ function buildPayload(memory) {
   if (intel.orderNumbers?.length > 0)   extractedIntelligence.orderNumbers   = intel.orderNumbers;
 
   return {
-    // ── Required fields (2pts each) ──
+    // ── Required fields 2 point each
     sessionId:              memory.sessionId,
     scamDetected:           true,
     extractedIntelligence,
 
-    // ── Engagement Quality ──
+    // ── Engagement Quality 
     engagementMetrics: {
       engagementDurationSeconds,
       totalMessagesExchanged
     },
 
-    // ── Optional fields (1pt each) ──
+    // ── Optional fields 1point each
     agentNotes:      generateAgentNotes(memory),
     scamType:        memory.scamType || "other",
     confidenceLevel: metrics.confidenceLevel || null

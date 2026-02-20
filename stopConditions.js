@@ -1,7 +1,3 @@
-/**
- * stopConditions.js
- * Single stop condition: turns >= 10.
- */
 
 export function shouldEnd(memory) {
   if (!memory || !memory.scamDetected) return false;

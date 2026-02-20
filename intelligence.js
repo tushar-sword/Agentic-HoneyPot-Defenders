@@ -1,7 +1,3 @@
-/**
- * intelligence.js
- * Extracts actionable scam intelligence from scammer messages.
- */
 
 const SUSPICIOUS_KEYWORDS = [
   "urgent", "verify", "blocked", "suspended", "account", "upi", "otp",
@@ -10,7 +6,7 @@ const SUSPICIOUS_KEYWORDS = [
   "winner", "claim", "payment", "transfer", "security"
 ];
 
-// Known UPI PSP handles — these are UPI, not email
+// Known UPI PSP handles 
 const UPI_PSP_HANDLES = new Set([
   "okaxis", "okhdfcbank", "okicici", "oksbi", "paytm", "ybl", "ibl",
   "axisbank", "hdfcbank", "icici", "sbi", "upi", "fbl", "rbl",
@@ -25,14 +21,14 @@ const UPI_PSP_HANDLES = new Set([
   "fakeupi", "fakebank", "fraudpay", "scampay"
 ]);
 
-// Real TLDs that indicate an email (not a UPI)
+// Real TLDs that indicate an email 
 const EMAIL_TLDS = new Set([
   "com", "in", "org", "net", "edu", "gov", "co", "io", "info",
   "biz", "me", "uk", "us", "au", "de", "fr", "jp", "cn", "ru",
   "gmail", "yahoo", "hotmail", "outlook", "icloud", "rediffmail"
 ]);
 
-// Personal email domains — these are emails, never UPI
+// Personal email domains 
 const PERSONAL_EMAIL_DOMAINS = new Set([
   "gmail.com", "yahoo.com", "yahoo.in", "hotmail.com", "outlook.com",
   "icloud.com", "rediffmail.com", "ymail.com", "live.com", "msn.com",
@@ -54,10 +50,7 @@ export function extractIntelligence(text, memory) {
   extractSuspiciousKeywords(text, intel);
 }
 
-/* ──────────────────────────────────────────────
-   PHONE NUMBERS
-────────────────────────────────────────────── */
-
+//phone number
 function extractPhoneNumbers(text, intel) {
   const phoneRegex = /(?<!\d)(\+91[\s\-]?|0)?[6-9]\d{9}(?!\d)/g;
 
@@ -92,17 +85,7 @@ function formatIndianPhone(raw) {
   return `+91-${mobile10}`;
 }
 
-/* ──────────────────────────────────────────────
-   UPI IDs vs EMAIL — CLEAR SEPARATION
-   
-   UPI format:  localpart@pspHandle
-   - pspHandle is a known PSP (ybl, oksbi, paytm, etc.)
-   - OR handle has NO dot and is not a known TLD
-   
-   Email format: localpart@domain.tld
-   - domain has a dot followed by a known TLD
-   - OR domain is a known personal email provider
-────────────────────────────────────────────── */
+//upi id vs email
 
 function extractUPIandEmail(text, intel) {
   // Match anything that looks like user@something
@@ -114,24 +97,24 @@ function extractUPIandEmail(text, intel) {
     const localPart = match[1].toLowerCase();
     const domainPart = match[2].toLowerCase();
 
-    // Skip if it's inside a URL (handled by phishing link extractor)
+    
     const precedingChar = text[match.index - 1];
     if (precedingChar === "/" || precedingChar === ":") continue;
 
     const classification = classifyAtString(localPart, domainPart, full);
 
     if (classification === "email") {
-      // Don't add if already stored as UPI
+      // Donot add if already stored as UPI
       if (!intel.upiIds.some(u => u === full)) {
         addUnique(intel.emailAddresses, full);
       }
     } else if (classification === "upi") {
-      // Don't add if already stored as email
+      // Donot add if already stored as email
       if (!intel.emailAddresses.some(e => e === full)) {
         addUnique(intel.upiIds, full);
       }
     }
-    // classification === "skip" → ignore
+
   }
 }
 
@@ -142,21 +125,19 @@ function classifyAtString(localPart, domainPart, full) {
     const tld = parts[parts.length - 1];
     const secondLevel = parts.slice(0, -1).join(".");
 
-    // Known personal email → definitely email
+    // Known personal email 
     if (PERSONAL_EMAIL_DOMAINS.has(domainPart)) return "email";
 
-    // Known TLD → email
+    // Known TLD indicates email
     if (EMAIL_TLDS.has(tld)) return "email";
 
-    // Has dot but unrecognised TLD — treat as email (safer assumption)
+    // Has dot but unrecognised TLD — email
     return "email";
   }
 
   // No dot in domain — check if it's a known UPI PSP handle
   if (UPI_PSP_HANDLES.has(domainPart)) return "upi";
 
-  // Domain is a short word with no dot — could be UPI handle like "fakebank"
-  // Treat as UPI only if localpart looks like a UPI ID (no spaces, reasonable length)
   if (domainPart.length >= 2 && domainPart.length <= 20 && /^[a-z0-9.\-_]+$/.test(domainPart)) {
     return "upi";
   }
@@ -164,10 +145,7 @@ function classifyAtString(localPart, domainPart, full) {
   return "skip";
 }
 
-/* ──────────────────────────────────────────────
-   BANK ACCOUNTS
-────────────────────────────────────────────── */
-
+//bank accounts
 function extractBankAccounts(text, intel) {
   const bankRegex = /\b\d{11,18}\b/g;
   const matches = text.match(bankRegex) || [];
@@ -179,10 +157,7 @@ function extractBankAccounts(text, intel) {
   }
 }
 
-/* ──────────────────────────────────────────────
-   PHISHING LINKS
-   Must start with http/https — clearly a URL, not an email.
-────────────────────────────────────────────── */
+//phishing links
 
 function extractPhishingLinks(text, intel) {
   const linkRegex = /https?:\/\/[^\s"'<>)\]]+/g;
@@ -196,11 +171,7 @@ function extractPhishingLinks(text, intel) {
   }
 }
 
-/* ──────────────────────────────────────────────
-   CASE IDs / REFERENCE IDs
-   Patterns: CAS-12345, CASE/123456, REF-XXXXXX,
-   SBI-12345, TKT-XXXX, INC-XXXX, SR-XXXX
-────────────────────────────────────────────── */
+//ids
 
 function extractCaseIds(text, intel) {
   // Pattern A: short keyword prefix glued (with optional - or /) to a value containing 4+ digits
@@ -220,11 +191,6 @@ function extractCaseIds(text, intel) {
   }
 }
 
-/* ──────────────────────────────────────────────
-   POLICY NUMBERS
-   Patterns: POL-XXXXXX, POLICY/123456,
-   LIC-XXXXX, INS-XXXXX
-────────────────────────────────────────────── */
 
 function extractPolicyNumbers(text, intel) {
   // Require full keyword (no short "INS", "POL" alone — too ambiguous)
@@ -239,7 +205,6 @@ function extractPolicyNumbers(text, intel) {
   for (const pattern of policyPatterns) {
     for (const m of text.matchAll(pattern)) {
       const num = (m[1] || m[0]).trim().toUpperCase();
-      // Must contain 4+ digits — rejects pure-letter false positives
       if (/\d{4,}/.test(num)) {
         addUnique(intel.policyNumbers, num);
       }
@@ -247,11 +212,7 @@ function extractPolicyNumbers(text, intel) {
   }
 }
 
-/* ──────────────────────────────────────────────
-   ORDER NUMBERS
-   Patterns: ORD-XXXXXX, ORDER#12345,
-   #OD12345678, Amazon/Flipkart style
-────────────────────────────────────────────── */
+//order numbers
 
 function extractOrderNumbers(text, intel) {
   // Only full keywords + digit-containing values — no short ambiguous prefixes like "IN", "B0"
@@ -273,9 +234,7 @@ function extractOrderNumbers(text, intel) {
   }
 }
 
-/* ──────────────────────────────────────────────
-   SUSPICIOUS KEYWORDS
-────────────────────────────────────────────── */
+//suspicious keywords
 
 function extractSuspiciousKeywords(text, intel) {
   const lowerText = text.toLowerCase();
@@ -286,9 +245,7 @@ function extractSuspiciousKeywords(text, intel) {
   }
 }
 
-/* ──────────────────────────────────────────────
-   HELPERS
-────────────────────────────────────────────── */
+// helper function
 
 function isLikelyPhone(numStr) {
   const d = numStr.replace(/\D/g, "");
@@ -299,7 +256,6 @@ function isLikelyPhone(numStr) {
 }
 
 function looksLikeNoise(str) {
-  // Reject strings that are all the same character or too generic
   if (/^(.)\1+$/.test(str)) return true;
   if (/^\d{1,3}$/.test(str)) return true;
   return false;

@@ -95,11 +95,11 @@ FINAL_CALLBACK_URL=https://hackathon.guvi.in/api/updateHoneyPotFinalResult
 npm start
 ```
 
-The API will be available at `http://localhost:3000`. For the public URL use your deployed domain (e.g. `https://agentic-honeypot-mlsx.onrender.com`).
+The API will be available at `http://localhost:3000`. For the public URL use your deployed domain (`https://agentic-honeypot-defenders-production.up.railway.app/honeypot`).
 
 ### Quick test
 ```bash
-curl -X POST http://localhost:3000/honeypot \
+curl -X POST https://agentic-honeypot-defenders-production.up.railway.app/honeypot \
   -H "Content-Type: application/json" \
   -H "x-api-key: your_secure_honeypot_api_key" \
   -d '{
@@ -131,7 +131,7 @@ Expected response:
 
 ## API Endpoint
 
-**URL:** `PUT THE FINAL URL HERE`
+**URL:** `https://agentic-honeypot-defenders-production.up.railway.app/honeypot`
 **Method:** `POST`
 **Authentication:** `x-api-key` header
 

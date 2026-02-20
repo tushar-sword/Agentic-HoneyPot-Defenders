@@ -1,7 +1,3 @@
-/**
- * memoryStore.js
- * In-memory session store for active honeypot conversations.
- */
 
 const sessions = new Map();
 
@@ -58,8 +54,8 @@ function createNewMemory(sessionId) {
     // Session metrics
     metrics: {
       totalMessages: 0,
-      confidenceLevel: null,      // Set when scam is detected by lookup agent
-      engagementStartTime: null,  // Set when scam is first detected
+      confidenceLevel: null,      
+      engagementStartTime: null,  
       lastMessageTime: null
     }
   };
