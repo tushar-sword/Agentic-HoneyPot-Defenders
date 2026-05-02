@@ -1,309 +1,253 @@
-# 🛡️ Agentic Honeypot API
+# Agentic Honeypot API 🛡️🤖
 
-### An AI-Powered Scam Engagement & Intelligence Extraction System
-**Built by Team: The Defenders**
-**GUVI Hackathon Finals — February 2026**
-
-[![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
-[![OpenAI](https://img.shields.io/badge/OpenAI-GPT--4o--mini-blue.svg)](https://openai.com/)
+AI-Powered Scam Engagement & Intelligence Extraction System
 
 
----
+## Demo 🎥
 
-## Description
-
-Agentic Honeypot is an **autonomous, multi-agent system** that detects, engages, and extracts forensic intelligence from scam attempts in real time. Rather than simply blocking threats, the system impersonates a convincing victim to waste scammer resources, gather actionable intelligence, and deliver a structured report to a configurable webhook.
-
-**Core strategy:**
-
-- **Detect** — A Lookup Agent analyses the first message for 9 categories of scam indicators and classifies the scam type (bank, UPI, lottery, job, phishing, KYC, customs, tech support, investment, and more).
-- **Engage** — A Handler Agent responds with human-like, emotionally-appropriate replies tuned to the detected scam type, asking investigative questions and probing for verifiable details across up to 10 conversation turns.
-- **Extract** — At every turn, a regex + pattern engine harvests phone numbers, UPI IDs, bank accounts, phishing links, email addresses, and identifying IDs from the scammer's messages.
-- **Report** — When a stop condition is met (10 turns, 5+ intel pieces, or timeout), the system compiles a structured JSON payload and POSTs it to a configurable callback URL with retry logic.
-
-The result is a system that scores across all five official evaluation axes: scam detection, intelligence extraction, conversation quality, engagement depth, and response structure compliance.
+![Watch Demo Video here](https://github.com/user-attachments/assets/fc57eb8b-32d1-4b48-b59f-82dc8478155d)
 
 ---
 
-## Tech Stack
+## Presentation 📊
 
-**Language / Framework**
-- Node.js 18+ (ES modules)
-- Express.js — REST API server
-
-**Key Libraries**
-- `openai` — OpenAI Node.js SDK (GPT-4o-mini completions in JSON mode)
-- `zod` — Runtime schema validation for LLM JSON outputs
-- `dotenv` — Environment variable management
-- `node-fetch` / native `fetch` — Webhook callback HTTP client
-
-**LLM / AI Models**
-- **GPT-4o-mini** — Used for both the Lookup Agent (scam classification) and the Handler Agent (engagement + response generation). Temperature 0.75, JSON mode enabled, 128K context window.
-
-**Intelligence Extraction**
-- Custom regex engine covering: phone numbers (Indian + international formats), UPI IDs, bank account numbers, phishing/HTTP links, email addresses, and reference/employee IDs.
-
-**Infrastructure**
-- Deployment: Render (primary) — Railway / AWS Lambda compatible
-- Authentication: `x-api-key` header validation
-- Session state: In-memory JavaScript `Map` (stateless, no external DB required)
-- Webhook delivery: 3-attempt retry with 500 ms backoff
+Hackathon Presentation:  
+[The Defenders PPT – India AI Impact Buildathon](https://github.com/user-attachments/files/25664547/The.Defenders.PPT.-.India.AI.Impact.Buildathon.1.pdf)
 
 ---
 
-## Setup Instructions
+## Overview
 
-### Prerequisites
-- Node.js 18+ — [nodejs.org](https://nodejs.org/)
-- An OpenAI API key — [platform.openai.com](https://platform.openai.com/api-keys)
-- npm package manager
+Agentic Honeypot is an autonomous multi-agent system that detects scams, engages scammers like a real human victim, extracts forensic intelligence in real time, and submits a structured report via webhook.
 
-### 1. Clone the repository
+Instead of blocking threats, the system wastes scammer time while collecting actionable intelligence.
+
+---
+
+## System Flow 🔄
+
+Incoming Message
+→ Express API (Authentication + Validation)
+→ Lookup Agent (Scam Detection)
+→ Handler Agent (Human-like Engagement)
+→ Intelligence Extraction Engine
+→ In-Memory Session Store
+→ Stop Condition Check
+→ Final Webhook Callback
+
+---
+
+## Architecture Components 🧠
+
+### 1. Lookup Agent (Detection)
+
+GPT-4o-mini classifies scam types using indicator categories such as:
+
+- Urgency and threat tactics
+- OTP / Aadhaar / PAN requests
+- Payment pressure
+- Suspicious links
+- Authority impersonation
+- Job / investment offers
+- Lottery or reward claims
+- Government scheme misuse
+- Courier / customs threats
+
+Output:
+
+```json
+{
+  "scamDetected": true,
+  "scamType": "bank_fraud",
+  "confidence": 0.95
+}
+```
+
+---
+
+### 2. Handler Agent (Engagement)
+
+- Maintains natural emotional tone
+- Asks investigative follow-ups
+- Avoids redundant intel collection
+- Adapts strategy by turn count
+- Explicitly identifies red flags
+
+Up to 15 turns per session.
+
+---
+
+### 3. Intelligence Extraction Engine
+
+Regex and pattern-based detection captures:
+
+- Phone numbers
+- Bank accounts
+- UPI IDs
+- Phishing links
+- Email addresses
+- Case / employee / reference IDs
+
+All data is deduplicated and stored in session memory.
+
+---
+
+### 4. Reporting (Structured Webhook)
+
+Session stops when:
+
+- 15 turns reached
+- 4 intelligence items collected
+- 20 seconds inactivity
+
+Final payload:
+
+```json
+{
+  "sessionId": "ht-bank_fraud-1700000000000",
+  "scamDetected": true,
+  "scamType": "bank_fraud",
+  "confidenceLevel": 0.97,
+  "extractedIntelligence": {
+    "phoneNumbers": [],
+    "bankAccounts": [],
+    "upiIds": [],
+    "phishingLinks": [],
+    "emailAddresses": []
+  },
+  "engagementMetrics": {
+    "totalMessagesExchanged": 10,
+    "engagementDurationSeconds": 75
+  },
+  "agentNotes": "Bank impersonation scam using urgency tactics."
+}
+```
+
+---
+
+## Tech Stack ⚙️
+
+- Node.js 18+
+- Express.js
+- OpenAI GPT-4o-mini
+- Zod (schema validation)
+- dotenv (environment configuration)
+
+---
+
+## Setup
+
+### 1. Clone
+
 ```bash
-git clone https://github.com/tushar-sword/Agentic-Honeypot.git
+git clone https://github.com/The-ShambhaviPandey/Agentic-Honeypot.git
 cd Agentic-Honeypot
 ```
 
-### 2. Install dependencies
+### 2. Install
+
 ```bash
 npm install
 ```
 
-### 3. Set environment variables
+### 3. Configure
+
 ```bash
 cp .env.example .env
 ```
 
-Edit `.env` and fill in your values:
+`.env`:
 
-```env
+```
 PORT=3000
-API_KEY=your_secure_honeypot_api_key
-OPENAI_API_KEY=your_openai_api_key
-FINAL_CALLBACK_URL=https://hackathon.guvi.in/api/updateHoneyPotFinalResult
+API_KEY=your_api_key
+OPENAI_API_KEY=your_openai_key
+FINAL_CALLBACK_URL=your_webhook_url
 ```
 
-| Variable | Description |
-|---|---|
-| `PORT` | Port the Express server listens on (default: 3000) |
-| `API_KEY` | Secret key clients must send in `x-api-key` header |
-| `OPENAI_API_KEY` | Your OpenAI API key for GPT-4o-mini calls |
-| `FINAL_CALLBACK_URL` | Webhook URL to POST the final intelligence payload to |
+### 4. Run
 
-### 4. Run the application
 ```bash
 npm start
 ```
 
-The API will be available at `http://localhost:3000`. For the public URL use your deployed domain (`https://agentic-honeypot-defenders-production.up.railway.app/honeypot`).
-
-### Quick test
-```bash
-curl -X POST https://agentic-honeypot-defenders-production.up.railway.app/honeypot \
-  -H "Content-Type: application/json" \
-  -H "x-api-key: your_secure_honeypot_api_key" \
-  -d '{
-    "sessionId": "test-session-001",
-    "message": {
-      "sender": "scammer",
-      "text": "URGENT: Your SBI account will be blocked tonight. Share OTP immediately to reactivate.",
-      "timestamp": "2026-02-20T10:00:00Z"
-    },
-    "conversationHistory": [],
-    "metadata": {
-      "channel": "SMS",
-      "language": "English",
-      "locale": "IN"
-    }
-  }'
-```
-
-Expected response:
-```json
-{
-  "status": "success",
-  "scamDetected": true,
-  "reply": "Oh no, I'm worried! Can you tell me your employee ID so I can verify this is official?"
-}
-```
-
 ---
 
-## API Endpoint
+## API Endpoint 🔗
 
-**URL:** `https://agentic-honeypot-defenders-production.up.railway.app/honeypot`
-**Method:** `POST`
-**Authentication:** `x-api-key` header
+**POST** `/honeypot`
+Header: `x-api-key`
 
-### Request format
+Request:
 
 ```json
 {
-  "sessionId": "uuid-string",
+  "sessionId": "ht-bank_fraud-1700000000000",
   "message": {
     "sender": "scammer",
-    "text": "Message content from the scammer",
-    "timestamp": "2026-02-20T10:30:00Z"
+    "text": "Your SBI account will be blocked. Share OTP.",
+    "timestamp": "2026-03-01T10:00:00.000Z"
   },
-  "conversationHistory": [
-    {
-      "sender": "scammer",
-      "text": "Earlier scammer message",
-      "timestamp": "1708425600000"
-    },
-    {
-      "sender": "user",
-      "text": "Earlier honeypot reply",
-      "timestamp": "1708425601000"
-    }
-  ],
-  "metadata": {
-    "channel": "SMS",
-    "language": "English",
-    "locale": "IN"
-  }
+  "metadata": {}
 }
 ```
 
-### Response format
+Response:
 
 ```json
 {
   "status": "success",
-  "scamDetected": true,
-  "reply": "Honeypot agent response text"
-}
-```
-
-### Final payload (POSTed to FINAL_CALLBACK_URL)
-
-After the conversation ends, the system sends a structured intelligence report:
-
-```json
-{
-  "sessionId": "9a5d9d59-8af3-4fba-8220-3c6117106750",
-  "scamDetected": true,
-  "extractedIntelligence": {
-    "phoneNumbers": ["+91-9876543210"],
-    "bankAccounts": ["1234567890123456"],
-    "upiIds": ["scammer.fraud@fakebank"],
-    "phishingLinks": ["https://secure.fakebank.com/verify"],
-    "emailAddresses": ["support@fakebank.com"],
-    "caseIds": ["REF2026001"],
-    "policyNumbers": ["POL-123456"],
-    "orderNumbers": ["ORD-98765"]
-  },
-  "engagementMetrics": {
-    "engagementDurationSeconds": 180,
-    "totalMessagesExchanged": 20
-  },
-  "agentNotes": "Banking/financial institution impersonation scam. Detected with very high confidence. Scammer tactics: provided contact number for off-platform communication; shared malicious/phishing links; requested or shared financial/payment details; provided email for ongoing contact; referenced official-sounding case/reference IDs to appear legitimate. Red flags detected — suspicious keywords used: urgent, verify, blocked, account, otp, immediately, confirm. Extracted 8 intelligence items over 10 conversation turns. Detection basis: Message impersonates SBI, creates urgency about account blocking, requests OTP and account number.",
-  "scamType": "bank_fraud",
-  "confidenceLevel": 0.95
+  "reply": "I'm worried. Can you share your phone number for one to one conversation?"
 }
 ```
 
 ---
 
-## Approach
+## Performance Metrics 📈
 
-### How scam detection works
-
-The **Lookup Agent** (GPT-4o-mini, JSON mode) processes the incoming message and the last 5 turns of conversation history. It evaluates 9 categories of scam indicators:
-
-1. Urgency and threats ("account blocked", "final warning", "legal action")
-2. Sensitive data requests (OTP, Aadhaar, PAN, passwords)
-3. Payment and financial pressure (UPI transfers, processing fees, TDS)
-4. Suspicious links and downloads (unofficial domains, URL shorteners)
-5. Account and security impersonation (SBI, Paytm, MSEDCL, Microsoft)
-6. Prize and reward claims (KBC, lottery, WhatsApp lucky draw)
-7. Job and investment fraud (WFH offers, crypto platforms, guaranteed returns)
-8. Government scheme exploitation (PM Kisan, income tax refunds)
-9. Courier and customs threats (FedEx duty, customs seizure)
-
-The agent outputs a confidence score (0–1) and a scam type label used by the Handler Agent to select its emotional profile and questioning strategy.
-
-### How intelligence extraction works
-
-Every incoming message is passed through a dedicated **Extraction Engine** (`intelligence.js`) using compiled regex patterns:
-
-| Data type | Extraction logic |
-|---|---|
-| Phone numbers | Matches Indian (6–9 prefix, 10 digits) and international formats; strips `+91`, spaces, dashes before deduplication |
-| UPI IDs | `username@provider` pattern; excludes common email TLDs (gmail, yahoo, outlook) |
-| Bank accounts | 11–18 digit sequences; excludes patterns that match phone numbers |
-| Phishing links | Full `http://` and `https://` URLs |
-| Email addresses | Standard RFC-compliant email regex |
-| Identifying IDs | Contextual patterns: "employee ID is X", "REF-XXXX", "TXN-XXXXXX" |
-
-Extracted intel is merged into the session's `extractedIntelligence` object on every turn, deduplicated, and included in the final callback payload.
-
-### How engagement is maintained
-
-The **Handler Agent** (GPT-4o-mini) uses a **dynamic prompt** built from four inputs at each turn:
-
-- **Scam type** — selects emotional profile (anxiety for bank scams, excitement for lottery, confusion for delivery)
-- **Turn number** — adjusts extraction strategy (early turns: single questions; mid turns: two at once; late turns: direct probing for any missing intel)
-- **Intelligence status** — the agent knows what has already been collected and what is still missing, so it never asks for something already provided
-- **Conversation history** — full context ensures responses are coherent and reference what the scammer actually said
-
-The agent is instructed to: ask exactly one investigative question per turn, name-drop red flags explicitly ("this seems suspicious — why do you need my OTP?"), attempt to elicit contact details, company names, registration numbers, and official websites, and express natural human emotion to avoid detection.
-
-When stop conditions are triggers, the callback fires and the session ends.
+| Metric                | Value   |
+| --------------------- | ------- |
+| Detection Precision   | 99.3%   |
+| Detection Recall      | 97.2%   |
+| Avg Intel per Session | 2.7     |
+| Avg Response Time     | 1.2s    |
+| Callback Success Rate | 99.2%   |
+| Cost per Conversation | < $0.01 |
 
 ---
 
-## Project Structure
+## Supported Scam Types 🕵️
 
-```
-agentic-honeypot/
-├── server.js               # Express server, routing, orchestration
-├── Agents/
-│   ├── lookupAgent.js      # Scam detection + classification (GPT-4o-mini)
-│   └── handlerAgent.js     # Engagement + response generation (GPT-4o-mini)
-├── intelligence.js         # Regex extraction engine (7 data types)
-├── memoryStore.js          # In-memory session state (Map)
-├── stopConditions.js       # 3-condition exit evaluator
-├── callback.js             # Webhook POST with retry logic
-├── .env.example            # Environment variable template
-├── package.json
-├── README.md
-├── docs/
-│   ├── architecture.md
-
- 
-
-```
+Bank fraud, UPI fraud, KYC fraud, job scams, lottery scams, utility fraud, government scheme fraud, courier/customs scams, crypto/investment fraud, tech support scams, loan scams, tax/refund fraud, insurance fraud, including multilingual variants.
 
 ---
 
-## Performance
+## Security Considerations 🔐
 
-| Metric | Value |
-|---|---|
-| Scam detection precision | 99.3% |
-| Scam detection recall | 97.2% |
-| Average intel pieces extracted | 2.7 per conversation |
-| Average conversation length | 13.4 messages |
-| Average end-to-end response time | 1.2 seconds |
-| Callback success rate | 99.2% |
-| Cost per conversation | ~$0.003 |
+- `x-api-key` authentication
+- Environment-based secret storage
+- No persistent PII storage
+- In-memory session lifecycle
+- Structured schema validation
 
 ---
 
-## Supported Scam Types
+## Recognition 🏆
 
-The system handles many scenario types used in evaluation, including: bank fraud, UPI fraud, phishing, KYC fraud, job scams, lottery scams, electricity bill fraud, government scheme fraud, crypto investment fraud, customs/parcel scams, tech support fraud, loan approval scams, income tax fraud, refund fraud, and insurance fraud — plus Hinglish and multi-language variants.
-
----
-
-## Acknowledgements
-
-- [OpenAI](https://openai.com/) for GPT-4o-mini
-- [GUVI](https://www.guvi.in/) for hosting the hackathon
-- [OpenAI Agents JS SDK](https://openai.github.io/openai-agents-js/)
+Grand Finalists — Top 2% in India
+AI Impact Buildathon — HCL & GUVI
+India AI Summit 2026 — Bharat Mandapam
 
 ---
 
-**Built with ❤️ by The Defenders**
-*Making the internet safer, one scam at a time.*
+## Post-Hackathon Disclaimer
+
+This repository has been updated after the conclusion of the India AI Impact Hackathon 2026.
+
+The current version reflects architectural and structural changes made based on independent design decisions and optimization goals. As a result, this implementation may no longer strictly adhere to all original hackathon submission constraints, evaluation rubrics, or capped conditions imposed during the competition.
+
+The system has been refined beyond hackathon limitations to better represent long-term scalability and technical standards.
+
+---
+
+BUILT WITH ❤️ BY THE DEFENDERS
